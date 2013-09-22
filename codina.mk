@@ -69,7 +69,7 @@ PRODUCT_COPY_FILES += \
 # Audio
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/audio_policy.conf:system/etc/audio_policy.conf \
-    $(COMMON_PATH)/configs/audio_policy.conf:system/vendor/etc/audio_policy.conf \
+    $(LOCAL_PATH)/configs/audio_policy.conf:system/vendor/etc/audio_policy.conf \
     $(LOCAL_PATH)/configs/adm.sqlite-u8500:system/etc/adm.sqlite-u8500 \
 
 PRODUCT_PACKAGES += \
@@ -90,12 +90,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     charger \
     charger_res_images
-
-# Keylayout configuration
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/usr/keylayout/codina-kp.kl:system/usr/keylayout/codina-kp.kl \
-    $(LOCAL_PATH)/usr/keylayout/codina-kp.kl:system/usr/keylayout/gpio-keys.kl
-
 
 # Bluetooth configuration files
 PRODUCT_COPY_FILES += \
