@@ -5,7 +5,6 @@ on init
     chmod 0701 /mnt/media_rw
     mkdir /mnt/shell/emulated 0700 shell shell
     mkdir /storage 0550 system sdcard_r
-    mkdir /storage/emulated 0555 root root
     mkdir /storage/sdcard0 0700 root root
     mkdir /storage/sdcard1 0700 root root
     mkdir /storage/usbdisk0 0775 system system
