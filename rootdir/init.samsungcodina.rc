@@ -1,19 +1,30 @@
 import init.samsungcodina.usb.rc
 
 on init
-    export EXTERNAL_STORAGE /storage/sdcard0
-    export SECONDARY_STORAGE /storage/sdcard1
-    mkdir /storage/sdcard0 0775 system system
-    mkdir /storage/sdcard1 0700 root root
-    mkdir /mnt/media_rw/sdcard1 0700 media_rw media_rw
+
+    chmod 0701 /mnt/media_rw
+    mkdir /mnt/shell/emulated 0700 shell shell
+    mkdir /storage 0550 system sdcard_r
+    mkdir /storage/emulated 0555 root root
+    mkdir /storage/sdcard1 0775 system system
+    mkdir /storage/usbdisk0 0775 system system
+    mkdir /mnt/media_rw/sdcard1 0775 system system
+    mkdir /mnt/media_rw/usbdisk0 0775 system system
+
+    export EXTERNAL_STORAGE /storage/emulated/legacy
+    export EMULATED_STORAGE_SOURCE /mnt/shell/emulated
+    export EMULATED_STORAGE_TARGET /storage/emulated
+
     mkdir /efs 0771 radio system
     mkdir /modemfs 0771 system system
     mkdir /preload 0771 system system
     mkdir /mnt/.lfs 0755 root root
 
     # for backwards compatibility
-    symlink /storage/sdcard0 /sdcard
-    symlink /storage/sdcard0 /mnt/sdcard
+    symlink /storage/emulated/legacy /sdcard
+    symlink /storage/emulated/legacy /mnt/sdcard
+    symlink /storage/emulated/legacy /storage/sdcard0
+    symlink /mnt/shell/emulated/0 /storage/emulated/legac
     symlink /storage/sdcard1 /extSdCard
     symlink /storage/sdcard1 /mnt/extSdCard
 
@@ -49,6 +60,9 @@ on init
 on fs
 
     mount_all /fstab.samsungcodina
+    
+    setprop ro.crypto.fuse_sdcard true
+    
     start cspsa
 
 on post-fs
@@ -538,6 +552,19 @@ service immvibed /system/bin/immvibed
 on property:ro.dumpstate.dmesg=1
     write /proc/sys/kernel/dmesg_restrict 0
 
+
+service sdcard /system/bin/sdcard -u 1023 -g 1023 -l /data/media /mnt/shell/emulated
+    class late_start
+
+service fuse_sdcard1 /system/bin/sdcard -u 1023 -g 1023 /mnt/media_rw/sdcard1 /storage/sdcard1
+    class late_start
+    disabled
+
+service fuse_usbdisk0 /system/bin/sdcard -u 1023 -g 1023 /mnt/media_rw/usbdisk0 /storage/usbdisk0
+    class late_start
+    disabled
+
+
 service p2p_supplicant /system/bin/wpa_supplicant \
         -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -N \
         -ip2p0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf -e/data/misc/wifi/entropy.bin \
@@ -606,8 +633,3 @@ service wlandutservice /system/bin/wlandutservice
     oneshot
 
 # end of wifi
-
-# FUSE sdcard daemon service for sdcard
-service fuse_sdcard1 /system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1
-    class late_start
-    disabled
